@@ -22,7 +22,7 @@ if [ ! -f /vault/config/init.done ]; then
   vault audit enable file file_path=stdout
   vault secrets enable -version=2 -path=secret kv
   vault secrets enable transit
-  vault token create -policy root -id $VAULT_DEV_ROOT_TOKEN_ID
+  vault token create -policy root -id $VAULT_APP_TOKEN
 
   # add a file to mark that the init has been done
   touch /vault/config/init.done
