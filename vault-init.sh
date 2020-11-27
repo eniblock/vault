@@ -1,5 +1,9 @@
 #!/usr/bin/env sh
 
+if [ -n "$VAULT_DEBUG" ]; then
+  set -ex
+fi
+
 if [ ! -f /vault/config/init.done ]; then
   mkdir -p /dev/shm/vault/config
   echo '{"backend": {"file": {"path": "/vault/file"}}, "listener": {"tcp": {"address": "127.0.0.1:8200", "tls_disable": 1}}}' > /dev/shm/vault/config/config.json
