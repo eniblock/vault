@@ -16,7 +16,7 @@ if [ ! -f /vault/config/init.done ]; then
   export VAULT_TOKEN=$ROOT_TOKEN
   if [ -n "$VAULT_INIT_TOKEN" ]; then
     # store these secrets in xdev's vault
-    env VAULT_TOKEN=$VAULT_INIT_TOKEN VAULT_ADDR=$VAULT_INIT_URL vault kv put $VAULT_INIT_PATH/vault unseal=$UNSEAL_KEY root=$ROOT_TOKEN
+    env VAULT_TOKEN=$VAULT_INIT_TOKEN VAULT_ADDR=$VAULT_INIT_URL vault kv put $VAULT_INIT_PATH/vault "unseal=$UNSEAL_KEY" "root=$ROOT_TOKEN"
   else
     # store the secrets locally so we can automatically restart vault in dev
     echo "$LOGS" > /vault/config/init.log
