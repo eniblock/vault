@@ -21,6 +21,7 @@ if [ ! -f /vault/config/init.done ]; then
     env VAULT_TOKEN=$VAULT_INIT_TOKEN VAULT_ADDR=$VAULT_INIT_URL vault kv put $VAULT_INIT_PATH/vault "unseal=$UNSEAL_KEY" "root=$ROOT_TOKEN"
   else
     LOGS=$(vault operator init -key-shares=1 -key-threshold=1)
+    UNSEAL_KEY=$(echo "$LOGS" | sed 's/^Unseal Key 1: \(.*\)$/\1/' | head -n 1)
 
     # store the secrets locally so we can automatically restart vault in dev
     echo "$LOGS" > /vault/config/init.log
