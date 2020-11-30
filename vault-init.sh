@@ -10,14 +10,18 @@ if [ ! -f /vault/config/init.done ]; then
   vault server -config /dev/shm/vault/config &
   export VAULT_ADDR='http://127.0.0.1:8200'
   dockerize -wait tcp://localhost:8200
-  LOGS=$(vault operator init -key-shares=1 -key-threshold=1)
-  UNSEAL_KEY=$(echo "$LOGS" | sed 's/^Unseal Key 1: \(.*\)$/\1/' | head -n 1)
-  ROOT_TOKEN=$(echo "$LOGS" | grep 'Initial Root Token' | sed 's/^Initial Root Token: \(.*\)$/\1/')
-  export VAULT_TOKEN=$ROOT_TOKEN
+
   if [ -n "$VAULT_INIT_TOKEN" ]; then
+    LOGS=$(vault operator init -recovery-shares=1 -recovery-threshold=1)
+    UNSEAL_KEY=$(echo "$LOGS" | sed 's/^Recovery Key 1: \(.*\)$/\1/' | head -n 1)
+    ROOT_TOKEN=$(echo "$LOGS" | grep 'Initial Root Token' | sed 's/^Initial Root Token: \(.*\)$/\1/')
+    export VAULT_TOKEN=$ROOT_TOKEN
+
     # store these secrets in xdev's vault
     env VAULT_TOKEN=$VAULT_INIT_TOKEN VAULT_ADDR=$VAULT_INIT_URL vault kv put $VAULT_INIT_PATH/vault "unseal=$UNSEAL_KEY" "root=$ROOT_TOKEN"
   else
+    LOGS=$(vault operator init -key-shares=1 -key-threshold=1)
+
     # store the secrets locally so we can automatically restart vault in dev
     echo "$LOGS" > /vault/config/init.log
   fi
