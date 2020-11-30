@@ -22,6 +22,8 @@ if [ ! -f /vault/config/init.done ]; then
   else
     LOGS=$(vault operator init -key-shares=1 -key-threshold=1)
     UNSEAL_KEY=$(echo "$LOGS" | sed 's/^Unseal Key 1: \(.*\)$/\1/' | head -n 1)
+    ROOT_TOKEN=$(echo "$LOGS" | grep 'Initial Root Token' | sed 's/^Initial Root Token: \(.*\)$/\1/')
+    export VAULT_TOKEN=$ROOT_TOKEN
 
     # store the secrets locally so we can automatically restart vault in dev
     echo "$LOGS" > /vault/config/init.log
