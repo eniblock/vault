@@ -4,7 +4,7 @@ if [ -n "$VAULT_DEBUG" ]; then
   set -ex
 fi
 
-if [ ! -f /vault/config/init.done ]; then
+if [ ! -f /vault/file/init.done ]; then
   mkdir -p /dev/shm/vault/config
   echo '{"backend": {"file": {"path": "/vault/file"}}, "listener": {"tcp": {"address": "127.0.0.1:8200", "tls_disable": 1}}}' > /dev/shm/vault/config/config.json
   vault server -config /dev/shm/vault/config &
@@ -26,7 +26,7 @@ if [ ! -f /vault/config/init.done ]; then
     export VAULT_TOKEN=$ROOT_TOKEN
 
     # store the secrets locally so we can automatically restart vault in dev
-    echo "$LOGS" > /vault/config/init.log
+    echo "$LOGS" > /vault/file/init.log
   fi
   vault operator unseal "$UNSEAL_KEY"
   # configure vault
@@ -39,19 +39,19 @@ if [ ! -f /vault/config/init.done ]; then
   fi
 
   # add a file to mark that the init has been done
-  touch /vault/config/init.done
+  touch /vault/file/init.done
 
   echo "restarting vault with the standard configuration"
   kill %1
   wait %1
 fi
 
-if [ -f /vault/config/init.log ]; then
+if [ -f /vault/file/init.log ]; then
   # the unseal key is available on the disk, lets use it
   vault server -config /vault/config &
 
   export VAULT_ADDR='http://127.0.0.1:8200'
-  UNSEAL_KEY=$(sed 's/^Unseal Key 1: \(.*\)$/\1/' < /vault/config/init.log | head -n 1)
+  UNSEAL_KEY=$(sed 's/^Unseal Key 1: \(.*\)$/\1/' < /vault/file/init.log | head -n 1)
   while ! vault operator unseal "$UNSEAL_KEY"; do
     sleep 1
   done

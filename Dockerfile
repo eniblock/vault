@@ -6,6 +6,5 @@ FROM vault:1.4.3
 COPY --from=dockerize-builder /usr/bin/dockerize /usr/bin/dockerize
 COPY vault-init.sh /
 COPY config.json /vault/config/
-VOLUME /vault/config
 ENV VAULT_INIT_URL=https://vault.theblockchainxdev.com
 CMD /vault-init.sh
