@@ -1,0 +1,13 @@
+#!/usr/bin/env python3
+
+import os
+import re
+from subprocess import check_output, check_call
+
+ref = check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD']).decode('utf-8').strip()
+sha = check_output(['git', 'rev-parse', '--short=8', 'HEAD']).decode('utf-8').strip()
+slug = re.sub('[^0-9a-z]', '-', ref.lower()).strip('-')[:63]
+
+img = 'registry.gitlab.com/the-blockchain-xdev/xdev-product/enterprise-business-network/vault'
+context = os.path.dirname(__file__)
+check_call(['docker', 'build', '-t', f'{img}:{sha}', '-t', f'{img}:{slug}', context])
