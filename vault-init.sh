@@ -1,7 +1,9 @@
 #!/usr/bin/env sh
 
+# make sure to stop if any of the command run in this script fail
+set -e
 if [ -n "$VAULT_DEBUG" ]; then
-  set -ex
+  set -x
 fi
 
 if [ ! -f /vault/file/init.done ]; then
