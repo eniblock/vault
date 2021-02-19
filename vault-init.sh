@@ -54,13 +54,10 @@ dockerize -template /vault/config/config-init.hcl.tpl:/vault/config/config.hcl
 if [ -f /vault/file/init.log ]; then
   # the unseal key is available on the disk, lets use it
   vault server -config /vault/config &
-
+  dockerize -wait tcp://localhost:8200
   export VAULT_ADDR='http://127.0.0.1:8200'
   UNSEAL_KEY=$(sed 's/^Unseal Key 1: \(.*\)$/\1/' < /vault/file/init.log | head -n 1)
-  while ! vault operator unseal "$UNSEAL_KEY"; do
-    sleep 1
-  done
-
+  vault operator unseal "$UNSEAL_KEY"
   wait %1
 else
   exec vault server -config /vault/config
