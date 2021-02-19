@@ -34,7 +34,9 @@ if [ ! -f /vault/file/init.done ]; then
   vault audit enable file file_path=stdout
   vault secrets enable -version=2 -path=secret kv
   vault secrets enable transit
-  vault token create -policy root -id $VAULT_APP_TOKEN
+  if [ -n "$VAULT_APP_TOKEN" ]; then
+    vault token create -policy root -id $VAULT_APP_TOKEN
+  fi
   if [ -f /custom-init.sh ]; then
     . /custom-init.sh
   fi
