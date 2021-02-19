@@ -8,8 +8,7 @@ fi
 
 if [ ! -f /vault/file/init.done ]; then
   mkdir -p /dev/shm/vault/config
-  echo '{"backend": {"file": {"path": "/vault/file"}}, "listener": {"tcp": {"address": "127.0.0.1:8200", "tls_disable": 1}}}' > /dev/shm/vault/config/config.json
-  vault server -config /dev/shm/vault/config &
+  dockerize -template /vault/config/config-init.hcl.tpl:/dev/shm/vault/config/config.hcl vault server -config /dev/shm/vault/config &
   export VAULT_ADDR='http://127.0.0.1:8200'
   dockerize -wait tcp://localhost:8200
 
@@ -47,6 +46,8 @@ if [ ! -f /vault/file/init.done ]; then
   kill %1
   wait %1
 fi
+
+dockerize -template /vault/config/config-init.hcl.tpl:/vault/config/config.hcl
 
 if [ -f /vault/file/init.log ]; then
   # the unseal key is available on the disk, lets use it
