@@ -1,0 +1,16 @@
+version: "3.0"
+services:
+  vault:
+    image: registry.gitlab.com/the-blockchain-xdev/xdev-product/enterprise-business-network/vault:latest
+    restart: always
+    environment:
+      - VAULT_DEBUG=true
+      - VAULT_APP_TOKEN=myroot
+    ports:
+      - "8200:8200"
+    volumes:
+      - vault:/vault/file
+    cap_add:
+      - IPC_LOCK
+volumes:
+  vault:
