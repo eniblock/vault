@@ -8,8 +8,7 @@ fi
 
 if [ ! -f /vault/file/init.done ]; then
   mkdir -p /dev/shm/vault/config
-  echo '{"backend": {"file": {"path": "/vault/file"}}, "listener": {"tcp": {"address": "127.0.0.1:8200", "tls_disable": 1}}}' > /dev/shm/vault/config/config.json
-  vault server -config /dev/shm/vault/config &
+  dockerize -template /vault/config/config-init.hcl.tpl:/dev/shm/vault/config/config.hcl vault server -config /dev/shm/vault/config &
   export VAULT_ADDR='http://127.0.0.1:8200'
   dockerize -wait tcp://localhost:8200
 
@@ -35,7 +34,9 @@ if [ ! -f /vault/file/init.done ]; then
   vault audit enable file file_path=stdout
   vault secrets enable -version=2 -path=secret kv
   vault secrets enable transit
-  vault token create -policy root -id $VAULT_APP_TOKEN
+  if [ -n "$VAULT_APP_TOKEN" ]; then
+    vault token create -policy root -id $VAULT_APP_TOKEN
+  fi
   if [ -f /custom-init.sh ]; then
     . /custom-init.sh
   fi
@@ -48,16 +49,15 @@ if [ ! -f /vault/file/init.done ]; then
   wait %1
 fi
 
+dockerize -template /vault/config/config-init.hcl.tpl:/vault/config/config.hcl
+
 if [ -f /vault/file/init.log ]; then
   # the unseal key is available on the disk, lets use it
   vault server -config /vault/config &
-
+  dockerize -wait tcp://localhost:8200
   export VAULT_ADDR='http://127.0.0.1:8200'
   UNSEAL_KEY=$(sed 's/^Unseal Key 1: \(.*\)$/\1/' < /vault/file/init.log | head -n 1)
-  while ! vault operator unseal "$UNSEAL_KEY"; do
-    sleep 1
-  done
-
+  vault operator unseal "$UNSEAL_KEY"
   wait %1
 else
   exec vault server -config /vault/config
