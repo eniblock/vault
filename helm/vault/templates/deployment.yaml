@@ -1,0 +1,95 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "vault.fullname" . }}
+  labels:
+    {{- include "vault.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "vault.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "vault.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "vault.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: VAULT_DEBUG
+              value: {{ .Values.vault.debug | quote }}
+            - name: VAULT_ADDR
+              value: {{ .Values.vault.addr | quote }}
+            {{ if .Values.vault.sealType }}
+            - name: VAULT_SEAL_TYPE
+              value: {{ .Values.vault.sealType | quote }}
+            - name: GOOGLE_PROJECT
+              value: {{ .Values.vault.googleProject | quote }}
+            - name: GOOGLE_REGION
+              value: {{ .Values.vault.googleRegion | quote }}
+            - name: VAULT_GCPCKMS_SEAL_KEY_RING
+              value: {{ .Values.vault.gcpckmsSealKeyRing | quote }}
+            - name: VAULT_GCPCKMS_SEAL_CRYPTO_KEY
+              value: {{ .Values.vault.gcpckmsSealCryptoKey | quote }}
+            - name: VAULT_INIT_PATH
+              value: {{ .Values.vault.initPath | quote }}
+            - name: VAULT_INIT_TOKEN
+              value: {{ .Values.vault.initToken | quote }}
+            {{ else }}
+            - name: VAULT_APP_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "vault.fullname" . | quote }}
+                  key: vault-app-token
+            {{ end }}
+          ports:
+            - name: http
+              containerPort: 8200
+              protocol: TCP
+#          livenessProbe:
+#            httpGet:
+#              path: /
+#              port: http
+#          readinessProbe:
+#            httpGet:
+#              path: /
+#              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - mountPath: /vault/file
+              name: {{ include "vault.fullname" . }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: vault
+          persistentVolumeClaim:
+            claimName: vault

@@ -1,0 +1,9 @@
+imageCredentials:
+  registry: registry.gitlab.com
+  username: maximevanmeerbeck
+  password: EiYysZYicx7n4tbkWYua
+  email: mvanmeerbeck@heblockchainxdev.com
+
+vault:
+  debug: true
+  appToken: myroot
