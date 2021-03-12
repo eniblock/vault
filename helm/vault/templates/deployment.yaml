@@ -90,6 +90,6 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       volumes:
-        - name: vault
+        - name: {{ include "vault.fullname" . }}
           persistentVolumeClaim:
-            claimName: vault
+            claimName: {{ include "vault.fullname" . }}
