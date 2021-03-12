@@ -71,10 +71,10 @@ Create the name of the service account to use
 Return Vault App Token
 */}}
 {{- define "vault.appToken" -}}
-{{- if .Values.global.vault.appToken }}
-    {{- .Values.global.vault.appToken -}}
-{{- else if .Values.vault.appToken -}}
-    {{- .Values.vault.appToken -}}
+{{- if .Values.global.server.dev.devRootToken }}
+    {{- .Values.global.server.dev.devRootToken -}}
+{{- else if .Values.server.dev.devRootToken -}}
+    {{- .Values.server.dev.devRootToken -}}
 {{- else -}}
     {{- randAlphaNum 10 -}}
 {{- end -}}

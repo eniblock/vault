@@ -3,7 +3,8 @@
 # Declare variables to be passed into your templates.
 
 global:
-  vault: {}
+  server:
+    dev: {}
 
 replicaCount: 1
 
@@ -79,13 +80,18 @@ tolerations: []
 
 affinity: {}
 
-vault:
+server:
   debug: false
-  addr: http://127.0.0.1:8200
-  sealType:
-  googleProject:
-  googleRegion:
-  gcpckmsSealKeyRing:
-  gcpckmsSealCryptoKey:
-  initPath:
-  initToken:
+
+  dev:
+    enabled: false
+
+  standalone:
+    enabled: true
+    sealType:
+    googleProject:
+    googleRegion:
+    gcpckmsSealKeyRing:
+    gcpckmsSealCryptoKey:
+    initPath:
+    initToken:

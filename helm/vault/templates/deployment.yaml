@@ -35,25 +35,26 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: VAULT_DEBUG
-              value: {{ .Values.vault.debug | quote }}
+              value: {{ .Values.debug | quote }}
             - name: VAULT_ADDR
-              value: {{ .Values.vault.addr | quote }}
-            {{ if .Values.vault.sealType }}
+              value: http://127.0.0.1:8200
+            {{ if .Values.server.standalone.enabled }}
             - name: VAULT_SEAL_TYPE
-              value: {{ .Values.vault.sealType | quote }}
+              value: {{ .Values.server.standalone.sealType | quote }}
             - name: GOOGLE_PROJECT
-              value: {{ .Values.vault.googleProject | quote }}
+              value: {{ .Values.server.standalone.googleProject | quote }}
             - name: GOOGLE_REGION
-              value: {{ .Values.vault.googleRegion | quote }}
+              value: {{ .Values.server.standalone.googleRegion | quote }}
             - name: VAULT_GCPCKMS_SEAL_KEY_RING
-              value: {{ .Values.vault.gcpckmsSealKeyRing | quote }}
+              value: {{ .Values.server.standalone.gcpckmsSealKeyRing | quote }}
             - name: VAULT_GCPCKMS_SEAL_CRYPTO_KEY
-              value: {{ .Values.vault.gcpckmsSealCryptoKey | quote }}
+              value: {{ .Values.server.standalone.gcpckmsSealCryptoKey | quote }}
             - name: VAULT_INIT_PATH
-              value: {{ .Values.vault.initPath | quote }}
+              value: {{ .Values.server.standalone.initPath | quote }}
             - name: VAULT_INIT_TOKEN
-              value: {{ .Values.vault.initToken | quote }}
-            {{ else }}
+              value: {{ .Values.server.standalone.initToken | quote }}
+            {{ end }}
+            {{ if .Values.server.dev.enabled }}
             - name: VAULT_APP_TOKEN
               valueFrom:
                 secretKeyRef:
@@ -64,14 +65,6 @@ spec:
             - name: http
               containerPort: 8200
               protocol: TCP
-#          livenessProbe:
-#            httpGet:
-#              path: /
-#              port: http
-#          readinessProbe:
-#            httpGet:
-#              path: /
-#              port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:

@@ -4,6 +4,12 @@ imageCredentials:
   password: EiYysZYicx7n4tbkWYua
   email: mvanmeerbeck@heblockchainxdev.com
 
-vault:
+server:
   debug: true
-  appToken: myroot
+
+  dev:
+    enabled: true
+    devRootToken: "myroot"
+
+  standalone:
+    enabled: false
