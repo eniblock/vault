@@ -1,0 +1,15 @@
+imageCredentials:
+  registry: registry.gitlab.com
+  username: xxxxxxx
+  password: xxxxxxx
+  email: xxxxxxx
+
+server:
+  debug: true
+
+  dev:
+    enabled: true
+    devRootToken: "myroot"
+
+  standalone:
+    enabled: false
