@@ -1,9 +1,3 @@
-imageCredentials:
-  registry: registry.gitlab.com
-  username: xxxxxxx
-  password: xxxxxxx
-  email: xxxxxxx
-
 server:
   debug: true
 

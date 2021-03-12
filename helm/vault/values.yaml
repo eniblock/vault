@@ -15,7 +15,7 @@ image:
   tag: "helm"
 
 imagePullSecrets:
-  - name: vault-gitlab-registry
+  - name: gitlab-registry
 nameOverride: ""
 fullnameOverride: ""
 
