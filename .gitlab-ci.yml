@@ -32,7 +32,7 @@ publish-helm:
     entrypoint: ["/bin/sh", "-c"]
   variables:
     HELM_EXPERIMENTAL_OCI: 1
-    HELM_IMAGE: $CI_REGISTRY_IMAGE/helm/vault:helm
+    HELM_IMAGE: $CI_REGISTRY_IMAGE/helm/vault:1.0.2
   script:
     - helm registry login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - helm chart save ./helm/vault $HELM_IMAGE
