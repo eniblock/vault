@@ -11,7 +11,7 @@ variables:
   CONTAINER_SHA_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
   CONTAINER_REF_SHA_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA
 
-publish-docker:
+publish_docker:
   stage: publish
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
@@ -25,7 +25,7 @@ publish-docker:
     - docker push $CONTAINER_SHA_IMAGE
     - docker push $CONTAINER_REF_SHA_IMAGE
 
-publish-helm:
+publish_helm:
   stage: publish
   image:
     name: alpine/helm:3.5.2
