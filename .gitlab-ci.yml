@@ -1,7 +1,9 @@
 image: docker:19.03.10
 
 stages:
+  - prepare
   - publish
+  - test
 
 services:
   - docker:dind
@@ -10,6 +12,24 @@ variables:
   CONTAINER_REF_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
   CONTAINER_SHA_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
   CONTAINER_REF_SHA_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA
+
+ci:
+  stage: prepare
+  image:
+    name: tbxdev/build-docker
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - buildctl-daemonless.sh build
+      --frontend dockerfile.v0
+      --local context=ci
+      --local dockerfile=ci
+      --export-cache mode=max,type=registry,ref=$CI_REGISTRY_IMAGE/ci:buildcache,push=true
+      --import-cache type=registry,ref=$CI_REGISTRY_IMAGE/ci:buildcache
+      --output type=image,name=$CI_REGISTRY_IMAGE/ci:$CI_COMMIT_REF_SLUG,push=true
+  only:
+    changes:
+      - ci/*
 
 publish_docker:
   stage: publish
@@ -24,6 +44,11 @@ publish_docker:
     - docker push $CONTAINER_REF_IMAGE
     - docker push $CONTAINER_SHA_IMAGE
     - docker push $CONTAINER_REF_SHA_IMAGE
+  only:
+    changes:
+      - Dockerfile
+      - vault-init.sh
+      - config*.tpl
 
 publish_helm:
   stage: publish
@@ -32,8 +57,35 @@ publish_helm:
     entrypoint: ["/bin/sh", "-c"]
   variables:
     HELM_EXPERIMENTAL_OCI: 1
-    HELM_IMAGE: $CI_REGISTRY_IMAGE/helm/vault:1.0.2
+    HELM_IMAGE: $CI_REGISTRY_IMAGE/helm:$CI_COMMIT_REF_SLUG
   script:
     - helm registry login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - helm chart save ./helm/vault $HELM_IMAGE
     - helm chart push $HELM_IMAGE
+  only:
+    changes:
+      - helm/**/*
+
+k8s:
+  stage: test
+  image: $CI_REGISTRY_IMAGE/ci:$CI_COMMIT_REF_SLUG
+  services:
+    - docker:dind
+  variables:
+    DOCKER_HOST: "tcp://docker:2375"
+    DOCKER_DRIVER: overlay2
+    HELM_EXPERIMENTAL_OCI: "1"
+  script:
+    - k3d cluster create default --port 80:80@loadbalancer --port 443:443@loadbalancer
+    - helm registry login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - kubectl create secret docker-registry gitlab-registry
+      --docker-server=$CI_REGISTRY
+      --docker-username=$CI_REGISTRY_USER
+      --docker-password=$CI_REGISTRY_PASSWORD
+    # we can only test oci helm chart as dependencies, so just skip that for now
+    # https://github.com/helm/helm/pull/9409
+    - helm install vault ./helm/vault
+      --set image.tag=$CI_COMMIT_REF_SLUG
+      --set image.pullSecrets={gitlab-registry}
+      --wait || (kubectl describe pod && false)
+    - helm list
