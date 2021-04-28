@@ -1,7 +1,3 @@
-image:
-  repository: "k3d-registry.localhost:5000/vault"
-  tag: "1.0.2"
-
 server:
   debug: true
 
@@ -11,3 +7,6 @@ server:
 
   standalone:
     enabled: false
+
+customInitScript: |
+  vault write transit/keys/mykey type=ed25519

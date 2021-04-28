@@ -40,6 +40,9 @@ if [ ! -f /vault/file/init.done ]; then
   if [ -f /custom-init.sh ]; then
     . /custom-init.sh
   fi
+  if [ -f /init/custom-init.sh ]; then
+    . /init/custom-init.sh
+  fi
 
   # add a file to mark that the init has been done
   touch /vault/file/init.done

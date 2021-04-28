@@ -95,3 +95,5 @@ server:
     gcpckmsSealCryptoKey:
     initPath:
     initToken:
+
+customInitScript: ""

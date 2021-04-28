@@ -8,3 +8,4 @@ k8s_yaml(
     )
 )
 docker_build('registry.gitlab.com/the-blockchain-xdev/xdev-product/enterprise-business-network/vault', '.')
+k8s_resource('vault', port_forwards='8200')

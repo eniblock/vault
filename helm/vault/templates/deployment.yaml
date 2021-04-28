@@ -70,6 +70,8 @@ spec:
           volumeMounts:
             - mountPath: /vault/file
               name: {{ include "vault.fullname" . }}
+            - name: config-volume
+              mountPath: /init
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -86,3 +88,6 @@ spec:
         - name: {{ include "vault.fullname" . }}
           persistentVolumeClaim:
             claimName: {{ include "vault.fullname" . }}
+        - name: config-volume
+          configMap:
+            name: {{ include "vault.fullname" . }}-configuration
