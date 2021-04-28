@@ -35,7 +35,7 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: VAULT_DEBUG
-              value: {{ .Values.debug | quote }}
+              value: {{ .Values.server.debug | quote }}
             - name: VAULT_ADDR
               value: http://127.0.0.1:8200
             {{ if .Values.server.standalone.enabled }}

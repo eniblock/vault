@@ -96,4 +96,8 @@ server:
     initPath:
     initToken:
 
+# custom init script to run to initialize vault. The environment is configured
+# to provide access to the local vault with a root token
+# Example:
+#   customInitScript: vault write transit/keys/mykey type=ed25519
 customInitScript: ""
