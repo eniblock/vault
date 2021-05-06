@@ -64,11 +64,11 @@ Create the name of the service account to use
 {{/*
 Return Vault App Token
 */}}
-{{- define "vault.appToken" -}}
-{{- if .Values.global.server.dev.devRootToken }}
-    {{- .Values.global.server.dev.devRootToken -}}
-{{- else if .Values.server.dev.devRootToken -}}
-    {{- .Values.server.dev.devRootToken -}}
+{{- define "vault.devRootToken" -}}
+{{- if .Values.global.server.dev.rootToken }}
+    {{- .Values.global.server.dev.rootToken -}}
+{{- else if .Values.server.dev.rootToken -}}
+    {{- .Values.server.dev.rootToken -}}
 {{- else -}}
     {{- randAlphaNum 10 -}}
 {{- end -}}

@@ -3,10 +3,13 @@ server:
 
   dev:
     enabled: true
-    devRootToken: "myroot"
 
   standalone:
     enabled: false
 
+  initSecrets:
+    foo: bar
+
 customInitScript: |
   vault write transit/keys/mykey type=ed25519
+  echo $foo

@@ -1,3 +1,4 @@
+{{- $fullName := include "vault.fullname" . -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -54,12 +55,19 @@ spec:
             - name: VAULT_INIT_TOKEN
               value: {{ .Values.server.standalone.initToken | quote }}
             {{ end }}
+            {{- range $key, $value := .Values.server.initSecrets }}
+            - name: {{ $key | quote }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $fullName | quote }}
+                  key: {{ $key | quote }}
+            {{- end }}
             {{ if .Values.server.dev.enabled }}
-            - name: VAULT_APP_TOKEN
+            - name: VAULT_ROOT_TOKEN
               valueFrom:
                 secretKeyRef:
                   name: {{ include "vault.fullname" . | quote }}
-                  key: vault-app-token
+                  key: VAULT_ROOT_TOKEN
             {{ end }}
           ports:
             - name: http
