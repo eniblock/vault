@@ -13,18 +13,11 @@ variables:
 
 publish_docker:
   stage: publish
-  image: docker:19.03.10
-  before_script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  image:
+    name: tbxdev/build-docker
   script:
-    - docker build --pull
-      -t $CONTAINER_REF_IMAGE
-      -t $CONTAINER_SHA_IMAGE
-      -t $CONTAINER_REF_SHA_IMAGE
-      .
-    - docker push $CONTAINER_REF_IMAGE
-    - docker push $CONTAINER_SHA_IMAGE
-    - docker push $CONTAINER_REF_SHA_IMAGE
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - build_with_helm_tag $CI_REGISTRY_IMAGE ./helm/vault
   only:
     changes:
       - Dockerfile
@@ -34,13 +27,10 @@ publish_docker:
 publish_helm:
   stage: publish
   image: tbxdev/build-helm
-  variables:
-    HELM_EXPERIMENTAL_OCI: 1
   script:
     - helm registry login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - HELM_IMAGE=$CI_REGISTRY_IMAGE/helm/vault:`yq eval .version ./helm/vault/Chart.yaml`-$CI_COMMIT_REF_SLUG.$CI_PIPELINE_IID
-    - helm chart save ./helm/vault $HELM_IMAGE
-    - helm chart push $HELM_IMAGE
+    - helm dependency update ./helm/vault
+    - build $CI_REGISTRY_IMAGE/helm/vault ./helm/vault
   only:
     changes:
       - helm/**/*
@@ -61,10 +51,11 @@ k8s:
       --docker-server=$CI_REGISTRY
       --docker-username=$CI_REGISTRY_USER
       --docker-password=$CI_REGISTRY_PASSWORD
+    - image_tag=`yq eval .version helm/vault/Chart.yaml`-$CI_COMMIT_REF_SLUG.$CI_PIPELINE_IID
     # we can only test oci helm chart as dependencies, so just skip that for now
     # https://github.com/helm/helm/pull/9409
     - helm install vault ./helm/vault
-      --set image.tag=$CI_COMMIT_REF_SLUG
+      --set image.tag=${CI_COMMIT_TAG:-$image_tag}
       --set image.pullSecrets={gitlab-registry}
       --wait || (kubectl describe pod && false)
     - helm list
