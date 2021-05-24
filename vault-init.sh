@@ -8,7 +8,12 @@ fi
 
 if [ ! -f /vault/file/init.done ]; then
   mkdir -p /dev/shm/vault/config
-  dockerize -template /vault/config/config-init.hcl.tpl:/dev/shm/vault/config/config.hcl vault server -config /dev/shm/vault/config &
+  cp -r /vault/config/* /dev/shm/vault/config/
+  if [ -z "$(ls -A /extra/config)" ]; then
+    cp -r /extra/config/* /dev/shm/vault/config/
+  fi
+  cp /listener-init.hcl /dev/shm/vault/config/listener.hcl
+  vault server -config /dev/shm/vault/config &
   export VAULT_ADDR='http://127.0.0.1:8200'
   dockerize -wait tcp://localhost:8200
 
@@ -44,6 +49,9 @@ if [ ! -f /vault/file/init.done ]; then
     . /init/custom-init.sh
   fi
 
+  # forget the root token, now that we don't need it anymore
+  unset VAULT_TOKEN
+
   # add a file to mark that the init has been done
   touch /vault/file/init.done
 
@@ -52,7 +60,9 @@ if [ ! -f /vault/file/init.done ]; then
   wait %1
 fi
 
-dockerize -template /vault/config/config-init.hcl.tpl:/vault/config/config.hcl
+if [ -z "$(ls -A /extra/config)" ]; then
+  cp -r /extra/config/* /vault/config/
+fi
 
 if [ -f /vault/file/init.log ]; then
   # the unseal key is available on the disk, lets use it

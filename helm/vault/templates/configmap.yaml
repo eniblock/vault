@@ -1,3 +1,18 @@
+{{- if .Values.customInitScript }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "vault.fullname" . }}-custom-init
+  labels:
+    {{- include "vault.labels" . | nindent 4 }}
+  namespace: {{ .Release.Namespace }}
+data:
+  custom-init.sh: |
+{{- .Values.customInitScript | nindent 4 }}
+{{- end}}
+
+---
+
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -6,5 +21,16 @@ metadata:
     {{- include "vault.labels" . | nindent 4 }}
   namespace: {{ .Release.Namespace }}
 data:
-  custom-init.sh: |
-{{- .Values.customInitScript | nindent 4 }}
+  {{- if .Values.server.standalone.enabled }}
+  gcp.hcl: |
+    seal "gcpckms" {
+      project     = {{ .Values.server.standalone.googleProject | quote }}
+      region      = {{ .Values.server.standalone.googleRegion | quote }}
+      key_ring    = {{ .Values.server.standalone.gcpckmsSealKeyRing | quote }}
+      crypto_key  = {{ .Values.server.standalone.gcpckmsSealCryptoKey | quote }}
+    }
+  {{- end }}
+  {{- range $key, $value := .Values.server.extraConfigs }}
+  {{ $key | quote }}: |
+    {{- $key | indent 4 }}
+  {{- end }}

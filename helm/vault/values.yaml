@@ -86,16 +86,17 @@ server:
     rootToken: myroot
 
   standalone:
-    enabled: true
-    sealType:
+    enabled: false
     googleProject:
-    googleRegion:
+    googleRegion: global
     gcpckmsSealKeyRing:
-    gcpckmsSealCryptoKey:
+    gcpckmsSealCryptoKey: unseal
     initPath:
     initToken:
 
-  initSecrets: []
+  initSecrets: {}
+
+  extraConfigs: {}
 
 # custom init script to run to initialize vault. The environment is configured
 # to provide access to the local vault with a root token

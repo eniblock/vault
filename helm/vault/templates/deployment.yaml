@@ -37,24 +37,6 @@ spec:
           env:
             - name: VAULT_DEBUG
               value: {{ .Values.server.debug | quote }}
-            - name: VAULT_ADDR
-              value: http://127.0.0.1:8200
-            {{ if .Values.server.standalone.enabled }}
-            - name: VAULT_SEAL_TYPE
-              value: {{ .Values.server.standalone.sealType | quote }}
-            - name: GOOGLE_PROJECT
-              value: {{ .Values.server.standalone.googleProject | quote }}
-            - name: GOOGLE_REGION
-              value: {{ .Values.server.standalone.googleRegion | quote }}
-            - name: VAULT_GCPCKMS_SEAL_KEY_RING
-              value: {{ .Values.server.standalone.gcpckmsSealKeyRing | quote }}
-            - name: VAULT_GCPCKMS_SEAL_CRYPTO_KEY
-              value: {{ .Values.server.standalone.gcpckmsSealCryptoKey | quote }}
-            - name: VAULT_INIT_PATH
-              value: {{ .Values.server.standalone.initPath | quote }}
-            - name: VAULT_INIT_TOKEN
-              value: {{ .Values.server.standalone.initToken | quote }}
-            {{ end }}
             {{- range $key, $value := .Values.server.initSecrets }}
             - name: {{ $key | quote }}
               valueFrom:
@@ -78,8 +60,12 @@ spec:
           volumeMounts:
             - mountPath: /vault/file
               name: {{ include "vault.fullname" . }}
-            - name: config-volume
+            - name: configuration
+              mountPath: /extra/config
+            {{- if .Values.customInitScript }}
+            - name: custom-init-volume
               mountPath: /init
+            {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -96,6 +82,11 @@ spec:
         - name: {{ include "vault.fullname" . }}
           persistentVolumeClaim:
             claimName: {{ include "vault.fullname" . }}
-        - name: config-volume
+        - name: configuration
           configMap:
             name: {{ include "vault.fullname" . }}-configuration
+      {{- if .Values.customInitScript }}
+        - name: custom-init-volume
+          configMap:
+            name: {{ include "vault.fullname" . }}-custom-init
+      {{- end }}
