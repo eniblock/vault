@@ -18,11 +18,6 @@ publish_docker:
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - build_with_helm_tag $CI_REGISTRY_IMAGE ./helm/vault
-  only:
-    changes:
-      - Dockerfile
-      - vault-init.sh
-      - config*.tpl
 
 publish_helm:
   stage: publish
