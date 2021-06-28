@@ -2,7 +2,7 @@
 
 # make sure to stop if any of the command run in this script fail
 set -e
-if [ -n "$VAULT_DEBUG" ]; then
+if [ "$VAULT_DEBUG" == "true" ]; then
   set -x
 fi
 
