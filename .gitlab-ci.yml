@@ -26,9 +26,6 @@ publish_helm:
     - helm registry login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - helm dependency update ./helm/vault
     - build $CI_REGISTRY_IMAGE/helm/vault ./helm/vault
-  only:
-    changes:
-      - helm/**/*
 
 k8s:
   stage: test
