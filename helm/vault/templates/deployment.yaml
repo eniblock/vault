@@ -34,6 +34,9 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          envFrom:
+            - secretRef:
+                name: {{ include "vault.fullname" . }}
           env:
             - name: VAULT_DEBUG
               value: {{ .Values.server.debug | quote }}
@@ -44,13 +47,6 @@ spec:
                   name: {{ $fullName | quote }}
                   key: {{ $key | quote }}
             {{- end }}
-            {{ if .Values.server.dev.enabled }}
-            - name: VAULT_ROOT_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  name: {{ include "vault.fullname" . | quote }}
-                  key: VAULT_ROOT_TOKEN
-            {{ end }}
           ports:
             - name: http
               containerPort: 8200
