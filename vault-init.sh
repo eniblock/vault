@@ -15,7 +15,7 @@ if [ ! -f /vault/file/init.done ]; then
 
   mkdir -p /dev/shm/vault/config
   cp -r /vault/config/* /dev/shm/vault/config/
-  if [ -z "$(ls -A /extra/config)" ]; then
+  if [ -n "$(ls -A /extra/config)" ]; then
     cp -r /extra/config/* /dev/shm/vault/config/
   fi
   cp /listener-init.hcl /dev/shm/vault/config/listener.hcl
@@ -66,7 +66,7 @@ if [ ! -f /vault/file/init.done ]; then
   wait %1
 fi
 
-if [ -z "$(ls -A /extra/config)" ]; then
+if [ -n "$(ls -A /extra/config)" ]; then
   cp -r /extra/config/* /vault/config/
 fi
 
