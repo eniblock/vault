@@ -24,7 +24,7 @@ publish_helm:
   image: tbxdev/build-helm
   script:
     - helm registry login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - helm dependency build ./helm/vault
+    - helm dependency update ./helm/vault
     - build $CI_REGISTRY_IMAGE/helm/vault ./helm/vault
 
 k8s:
