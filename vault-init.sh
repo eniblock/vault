@@ -7,6 +7,12 @@ if [ "$VAULT_DEBUG" == "true" ]; then
 fi
 
 if [ ! -f /vault/file/init.done ]; then
+  if [ -n "$VAULT_INIT_TOKEN" ]; then
+    # try to write something in vault, in order to be sure we'll be able to do that once
+    # the local vault will be initialized
+    env VAULT_TOKEN=$VAULT_INIT_TOKEN VAULT_ADDR=$VAULT_INIT_URL vault kv put $VAULT_INIT_PATH/vault "check=true"
+  fi
+
   mkdir -p /dev/shm/vault/config
   cp -r /vault/config/* /dev/shm/vault/config/
   if [ -z "$(ls -A /extra/config)" ]; then
