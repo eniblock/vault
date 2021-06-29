@@ -6,6 +6,11 @@ if [ "$VAULT_DEBUG" == "true" ]; then
   set -x
 fi
 
+# copy extra configuration from the config map
+for f in $(ls /extra/config); do
+  cat /extra/config/$f > /vault/config/$f
+done
+
 if [ ! -f /vault/file/init.done ]; then
   if [ -n "$VAULT_INIT_TOKEN" ]; then
     # try to write something in vault, in order to be sure we'll be able to do that once
@@ -15,9 +20,7 @@ if [ ! -f /vault/file/init.done ]; then
 
   mkdir -p /dev/shm/vault/config
   cp -r /vault/config/* /dev/shm/vault/config/
-  if [ -n "$(ls /extra/config)" ]; then
-    cp -r /extra/config/* /dev/shm/vault/config/
-  fi
+  # override the listener with one restricted to localhost
   cp /listener-init.hcl /dev/shm/vault/config/listener.hcl
   vault server -config /dev/shm/vault/config &
   export VAULT_ADDR='http://127.0.0.1:8200'
@@ -64,10 +67,6 @@ if [ ! -f /vault/file/init.done ]; then
   echo "restarting vault with the standard configuration"
   kill %1
   wait %1
-fi
-
-if [ -n "$(ls /extra/config)" ]; then
-  cp -r /extra/config/* /vault/config/
 fi
 
 if [ -f /vault/file/init.log ]; then
