@@ -37,6 +37,7 @@ k8s:
     DOCKER_DRIVER: overlay2
     HELM_EXPERIMENTAL_OCI: "1"
   script:
+    - while ! nc -z docker 2375; do sleep 1; done
     - k3d cluster create default --port 80:80@loadbalancer --port 443:443@loadbalancer
     - helm registry login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - kubectl create secret docker-registry gitlab-registry
