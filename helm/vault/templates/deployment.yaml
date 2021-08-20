@@ -68,6 +68,10 @@ spec:
             - name: custom-init-volume
               mountPath: /init
             {{- end }}
+          livenessProbe:
+            httpGet:
+              path: /v1/sys/health?standbyok=true
+              port: http
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
