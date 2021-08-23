@@ -109,3 +109,11 @@ server:
 #   customInitScript: vault write transit/keys/mykey type=ed25519
 
 customInitScript: ""
+
+persistence:
+  enabled: true
+  existingClaim: ""
+  storageClass: ""
+  accessModes:
+    - ReadWriteOnce
+  size: 1Gi

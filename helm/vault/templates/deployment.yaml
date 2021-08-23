@@ -87,7 +87,7 @@ spec:
       volumes:
         - name: {{ include "vault.fullname" . }}
           persistentVolumeClaim:
-            claimName: {{ include "vault.fullname" . }}
+            claimName: {{ .Values.persistence.existingClaim | default (include "vault.fullname" .) }}
         - name: configuration
           configMap:
             name: {{ include "vault.fullname" . }}-configuration
