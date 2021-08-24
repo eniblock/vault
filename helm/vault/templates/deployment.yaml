@@ -50,7 +50,7 @@ spec:
             - name: VAULT_ROOT_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.server.dev.existingSecret | quote }}
+                  name: {{ tpl .Values.server.dev.existingSecret . | quote }}
                   key: "root-token"
             {{- end }}
             {{- range $key, $value := .Values.server.initSecrets }}
