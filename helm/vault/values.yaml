@@ -89,6 +89,7 @@ server:
   dev:
     enabled: false
     rootToken: myroot
+    existingSecret: "" # Must contain 'root-token' key
 
   standalone:
     enabled: false

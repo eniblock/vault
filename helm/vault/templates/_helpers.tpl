@@ -62,7 +62,7 @@ Create the name of the service account to use
 {{- end }}
 
 {{/*
-Return Vault App Token
+Return Vault Root Token
 */}}
 {{- define "vault.devRootToken" -}}
 {{- if .Values.global.server.dev.rootToken }}

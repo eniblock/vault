@@ -46,6 +46,13 @@ spec:
           env:
             - name: VAULT_DEBUG
               value: {{ .Values.server.debug | quote }}
+            {{- if .Values.server.dev.existingSecret }}
+            - name: VAULT_ROOT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.server.dev.existingSecret | quote }}
+                  key: "root-token"
+            {{- end }}
             {{- range $key, $value := .Values.server.initSecrets }}
             - name: {{ $key | quote }}
               valueFrom:
