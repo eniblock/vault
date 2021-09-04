@@ -14,7 +14,6 @@ variables:
 helm-lint:
   stage: test
   image: registry.gitlab.com/the-blockchain-xdev/xdev-product/build-images/helm:1.3.0
-  allow_failure: true
   script:
     - lint helm/vault --values helm/vault/values-dev.yaml
 
