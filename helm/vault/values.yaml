@@ -118,3 +118,6 @@ persistence:
   accessModes:
     - ReadWriteOnce
   size: 1Gi
+
+networkPolicy:
+  enabled: true
