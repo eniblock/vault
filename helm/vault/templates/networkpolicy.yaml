@@ -14,4 +14,8 @@ spec:
       - podSelector:
           matchLabels:
             {{ include "vault.fullname" . }}-client: "true"
+  egress: []
+  policyTypes:
+    - Ingress
+    - Egress
 {{- end }}
