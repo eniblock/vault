@@ -111,6 +111,14 @@ server:
 
 customInitScript: ""
 
+# postStart command to be run after the container starts. Can be used to wait
+# for vault and do some custom work after it. To wait for vault, use the helper
+# /wait-for-vault.sh
+
+#   postStartScript: ["/postStart.sh"]
+
+postStartScript: ""
+
 persistence:
   enabled: true
   existingClaim: ""
