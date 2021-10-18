@@ -77,10 +77,20 @@ spec:
             - name: custom-init-volume
               mountPath: /init
             {{- end }}
+            {{- if .Values.postStartScript }}
+            - name: post-start-volume
+              mountPath: /post-start
+            {{- end }}
           livenessProbe:
             httpGet:
               path: /v1/sys/health?standbyok=true
               port: http
+          {{- if .Values.postStartScript }}
+          lifecycle:
+            postStart:
+              exec:
+                command: ["sh", "/post-start/post-start.sh"]
+          {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -104,4 +114,9 @@ spec:
         - name: custom-init-volume
           configMap:
             name: {{ include "vault.fullname" . }}-custom-init
+      {{- end }}
+      {{- if .Values.postStartScript }}
+        - name: post-start-volume
+          configMap:
+            name: {{ include "vault.fullname" . }}-post-start
       {{- end }}
