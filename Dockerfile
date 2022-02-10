@@ -9,4 +9,5 @@ COPY wait-for-vault.sh /
 COPY listener.hcl backend.hcl /vault/config/
 COPY listener-init.hcl /
 ENV VAULT_INIT_URL=https://vault.theblockchainxdev.com
+ENV VAULT_START_TIMEOUT=10s
 CMD /vault-init.sh
