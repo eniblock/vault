@@ -132,3 +132,4 @@ persistence:
 
 networkPolicy:
   enabled: true
+  useIngress: false
