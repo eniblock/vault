@@ -16,7 +16,7 @@ networkPolicy:
     from:
       - namespaceSelector:
           matchLabels:
-            app.kubernetes.io/name: ingress
+            kubernetes.io/metadata.name: ingress
 
 customInitScript: |
   vault write transit/keys/mykey type=ed25519
