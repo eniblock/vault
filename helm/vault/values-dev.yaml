@@ -10,14 +10,6 @@ server:
   initSecrets:
     foo: bar
 
-networkPolicy:
-  useIngress: true
-  ingress:
-    from:
-      - namespaceSelector:
-          matchLabels:
-            kubernetes.io/metadata.name: ingress
-
 customInitScript: |
   vault write transit/keys/mykey type=ed25519
   echo $foo
