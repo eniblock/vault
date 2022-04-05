@@ -12,7 +12,7 @@ spec:
       {{- include "vault.selectorLabels" . | nindent 6 }}
   ingress:
     - from:
-      - podSelector:
-          matchLabels:
-            {{ include "vault.fullname" . }}-client: "true"
+        - podSelector:
+            matchLabels:
+              {{ include "vault.fullname" . }}-client: "true"
 {{- end }}

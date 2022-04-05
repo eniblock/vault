@@ -40,9 +40,9 @@ podSecurityContext: {}
 # fsGroup: 2000
 
 securityContext:
-   capabilities:
-     add:
-     - IPC_LOCK
+  capabilities:
+    add:
+      - IPC_LOCK
 
 service:
   type: ClusterIP
