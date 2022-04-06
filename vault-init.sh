@@ -22,11 +22,11 @@ if [ ! -f /vault/file/init.done ]; then
 
   mkdir -p /dev/shm/vault/config
   cp -r /vault/config/* /dev/shm/vault/config/
-  # override the listener with one restricted to localhost
+  # override the listener with one restricted to 127.0.0.1
   cp /listener-init.hcl /dev/shm/vault/config/listener.hcl
   vault server -config /dev/shm/vault/config &
   export VAULT_ADDR='http://127.0.0.1:8201'
-  dockerize -wait tcp://localhost:8201 -timeout "${VAULT_START_TIMEOUT}"
+  dockerize -wait tcp://127.0.0.1:8201 -timeout "${VAULT_START_TIMEOUT}"
 
   if [ -n "$VAULT_INIT_TOKEN" ]; then
     LOGS=$(vault operator init -recovery-shares=1 -recovery-threshold=1)
@@ -74,7 +74,7 @@ fi
 if [ -f /vault/file/init.log ]; then
   # the unseal key is available on the disk, lets use it
   vault server -config /vault/config &
-  dockerize -wait tcp://localhost:8200 -timeout "${VAULT_START_TIMEOUT}"
+  dockerize -wait tcp://127.0.0.1:8200 -timeout "${VAULT_START_TIMEOUT}"
   export VAULT_ADDR='http://127.0.0.1:8200'
   UNSEAL_KEY=$(sed 's/^Unseal Key 1: \(.*\)$/\1/' < /vault/file/init.log | head -n 1)
   vault operator unseal "$UNSEAL_KEY"
