@@ -15,4 +15,9 @@ spec:
         - podSelector:
             matchLabels:
               {{ include "vault.fullname" . }}-client: "true"
+        {{- if .Values.ingress.enabled }}
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress
+        {{- end }}
 {{- end }}
