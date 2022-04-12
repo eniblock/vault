@@ -19,5 +19,9 @@ spec:
         - namespaceSelector:
             matchLabels:
               kubernetes.io/metadata.name: ingress
+        # use a lable explicitly set by xdev in case we are in kubernetes < 1.21
+        - namespaceSelector:
+            matchLabels:
+              name: ingress
         {{- end }}
 {{- end }}
