@@ -6,6 +6,11 @@ VAULT_START_TIMEOUT="${VAULT_START_TIMEOUT:-10s}"
 set -e
 if [ "$VAULT_DEBUG" == "true" ]; then
   set -x
+  err_func() {
+    echo 'Error raised. Sleeping 5 minutes before exiting to give you some time to debug.'
+    sleep 300
+  }
+  trap 'err_func' ERR
 fi
 
 # copy extra configuration from the config map
