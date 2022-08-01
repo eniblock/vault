@@ -33,6 +33,14 @@ publish_helm_oci:
     - helm dependency update ./helm/vault
     - build $CI_REGISTRY_IMAGE/helm/vault ./helm/vault
 
+publish_helm:
+  stage: helm
+  image: registry.gitlab.com/xdev-tech/build/helm:3.1
+  script:
+    - helm registry login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - helm dependency update ./helm/vault
+    - build_std ./helm/vault
+
 # k8s:
 #   stage: test
 #   image: registry.gitlab.com/xdev-tech/build/helm:1.5
