@@ -41,14 +41,14 @@ first place.
 For stable (tagged) versions:
 
 ```
-helm repo add hlf-k8s https://gitlab.com/api/v4/projects/26476601/packages/helm/stable
+helm repo add vault https://gitlab.com/api/v4/projects/26476601/packages/helm/stable
 helm search repo vault
 ```
 
 For development versions:
 
 ```
-helm repo add hlf-k8s https://gitlab.com/api/v4/projects/26476601/packages/helm/dev
+helm repo add vault https://gitlab.com/api/v4/projects/26476601/packages/helm/dev
 helm search repo vault --devel
 ```
 
