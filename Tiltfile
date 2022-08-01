@@ -14,8 +14,8 @@ docker_build('registry.gitlab.com/xdev-tech/xdev-enterprise-business-network/vau
 k8s_resource('vault', port_forwards='8200')
 
 local_resource('helm lint',
-               'docker run --rm -t -v $PWD:/app registry.gitlab.com/xdev-tech/build/helm:1.5' +
-               ' lint helm/vault --values helm/vault/values-dev.yaml',
+               'docker run --rm -t -v $PWD:/app registry.gitlab.com/xdev-tech/build/helm:3.1' +
+               ' lint vault helm/vault --values helm/vault/values-dev.yaml',
                'helm/vault/', allow_parallel=True)
 
 if config.tilt_subcommand == 'down' and not cfg.get("no-volumes"):
