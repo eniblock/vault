@@ -33,3 +33,32 @@ used so that you can focus on the things that matter.
 Again, don't use this in production, as the unseal key is stored in clear text
 next to vault files. It would kind of break the whole idea of using vault in the
 first place.
+
+## Usage
+
+### Standard
+
+For stable (tagged) versions:
+
+```
+helm repo add hlf-k8s https://gitlab.com/api/v4/projects/26476601/packages/helm/stable
+helm search repo vault
+```
+
+For development versions:
+
+```
+helm repo add hlf-k8s https://gitlab.com/api/v4/projects/26476601/packages/helm/dev
+helm search repo vault --devel
+```
+
+### OCI
+
+Add it as dependency in your `Chart.yml`
+
+~~~yaml
+dependencies:
+  - name: vault
+    version: "1.1.0"
+    repository: "oci://xdev-tech/xdev-enterprise-business-network/vault/helm"
+~~~
