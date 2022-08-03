@@ -62,3 +62,58 @@ dependencies:
     version: "1.1.0"
     repository: "oci://xdev-tech/xdev-enterprise-business-network/vault/helm"
 ~~~
+
+
+## Migrate from deployment to statefulset without loosing the data
+
+You have to provide an existing claim. Something like:
+
+```diff --git a/helm/identity/Chart.yaml b/helm/identity/Chart.yaml
+index cba280b..843238a 100644
+--- a/helm/identity/Chart.yaml
++++ b/helm/identity/Chart.yaml
+@@ -29,4 +29,4 @@ dependencies:
+     repository: "oci://registry.gitlab.com/xdev-tech/xdev-enterprise-business-network/keycloak/helm"
+   - name: vault
+     repository: "oci://registry.gitlab.com/xdev-tech/xdev-enterprise-business-network/vault/helm"
+-    version: "1.3.2-develop.66"
++    version: "1.3.2-develop.73"
+diff --git a/helm/identity/templates/vault-pvc.yaml b/helm/identity/templates/vault-pvc.yaml
+new file mode 100644
+index 0000000..37006fa
+--- /dev/null
++++ b/helm/identity/templates/vault-pvc.yaml
+@@ -0,0 +1,13 @@
++apiVersion: v1
++kind: PersistentVolumeClaim
++metadata:
++  name: {{ include "identity.fullname" . }}-vault
++  namespace: {{ .Release.Namespace }}
++  labels:
++    {{- include "identity.labels" . | nindent 4 }}
++spec:
++  accessModes:
++    - ReadWriteOnce
++  resources:
++    requests:
++      storage: 1Gi
+diff --git a/helm/identity/values.yaml b/helm/identity/values.yaml
+index 87797c2..9e3c300 100644
+--- a/helm/identity/values.yaml
++++ b/helm/identity/values.yaml
+@@ -250,8 +250,6 @@ global:
+   dev: false
+
+ vault:
+-  deploymentStrategy:
+-    type: Recreate
+   ingress:
+     enabled: true
+     annotations:
+@@ -277,3 +275,5 @@ vault:
+   server:
+     standalone:
+       enabled: false
++  persistence:
++    existingClaim: '{{ .Release.Name }}-vault'
+```
