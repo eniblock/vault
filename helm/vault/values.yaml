@@ -9,7 +9,7 @@ global:
 replicaCount: 1
 
 image:
-  repository: "registry.gitlab.com/xdev-tech/xdev-enterprise-business-network/vault"
+  repository: "eniblock/vault"
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   # tag: ""

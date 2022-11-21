@@ -10,7 +10,11 @@ k8s_yaml(
         name="vault",
     )
 )
-docker_build('registry.gitlab.com/xdev-tech/xdev-enterprise-business-network/vault', '.')
+custom_build(
+    'eniblock/vault',
+    'earthly +docker --ref=$EXPECTED_REF',
+    ['.'],
+)
 k8s_resource('vault', port_forwards='8200')
 
 local_resource('helm lint',
