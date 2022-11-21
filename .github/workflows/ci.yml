@@ -1,0 +1,51 @@
+name: ci
+on:
+  push:
+    branches:
+      - "**"
+    tags:
+      - "*"
+
+jobs:
+
+  ############################ tests ############################
+
+  lint-helm:
+    runs-on: [self-hosted]
+    steps:
+    - uses: eniblock/build/actions/setup@develop
+      id: setup
+      with:
+        dockerhub_token: ${{ secrets.DOCKERHUB_TOKEN }}
+    - run: earthly ./helm+lint
+
+  ############################ docker ############################
+
+  docker:
+    runs-on: [self-hosted]
+    needs: [lint-helm]
+    steps:
+    - uses: eniblock/build/actions/setup@develop
+      id: setup
+      with:
+        helmdir: helm/vault
+        dockerhub_token: ${{ secrets.DOCKERHUB_TOKEN }}
+    - run: earthly +docker --tag=${{ steps.setup.outputs.tag }}
+
+  ############################ helm ############################
+
+  helm-publish:
+    runs-on: [self-hosted]
+    needs: [docker]
+    steps:
+    - uses: eniblock/build/actions/setup@develop
+      id: setup
+      with:
+        helmdir: helm/vault
+        dockerhub_token: ${{ secrets.DOCKERHUB_TOKEN }}
+    - name: Build/Publish the helm charts
+      run: |
+        earthly \
+          --secret registry_password=${{ github.token }} \
+          ./helm+publish \
+          --tag=${{ steps.setup.outputs.tag }}
