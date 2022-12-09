@@ -7,7 +7,7 @@ dockerize:
     SAVE ARTIFACT /usr/bin/dockerize
 
 docker:
-    FROM vault:1.6.2
+    FROM vault:1.12.2
     COPY +dockerize/dockerize /usr/bin/dockerize
     COPY vault-init.sh /
     COPY wait-for-vault.sh /
