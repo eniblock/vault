@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-set -x
+set -eu
 
 VAULT_ADDRESS=localhost:8200
 # unlike VAULT_ADDR, that contains the http:// prefix
