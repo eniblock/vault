@@ -2,7 +2,7 @@
 
 set -eu
 
-VAULT_ADDRESS=localhost:8200
+VAULT_ADDRESS=127.0.0.1:8200
 # unlike VAULT_ADDR, that contains the http:// prefix
 
 dockerize -timeout 10s -wait "tcp://${VAULT_ADDRESS}"
