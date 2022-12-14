@@ -11,6 +11,7 @@ docker:
     COPY +dockerize/dockerize /usr/bin/dockerize
     COPY vault-init.sh /
     COPY wait-for-vault.sh /
+    COPY reload-plugin.sh /
     COPY listener.hcl backend.hcl /vault/config/
     COPY listener-init.hcl /
     ENV VAULT_INIT_URL=https://vault.theblockchainxdev.com
