@@ -1,7 +1,5 @@
 # Hashicorp's Vault docker image with dev friendly default
 
-![snyk logo](https://res.cloudinary.com/snyk/image/upload/v1468845142/favicon/favicon.ico)[To see snyk reports click here](https://app.snyk.io/org/glehmann/projects)
-
 This is a small wrapper on top of the base vault image that adds an
 initialization script.
 
