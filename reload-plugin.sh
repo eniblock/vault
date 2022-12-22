@@ -23,4 +23,4 @@ then
   vault secrets disable "${plugin_name}"
 fi
 
-vault secrets enable -path "${plugin_name}" -description 'From plugin "${plugin_name}"' "$@" "${plugin_name}"
+vault secrets enable -path "${plugin_name}" -description "From plugin '${plugin_name}'" "$@" "${plugin_name}"
