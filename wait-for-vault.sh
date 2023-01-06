@@ -21,7 +21,7 @@ while ! { wget -O - "http://${VAULT_ADDRESS}/v1/sys/health" 2>& 1 |grep -q '"ini
 do
     if test ${waited_time} -gt ${max_time}
     then
-        echo "I already waited ${waited_time}. I won't wait any longer."
+        echo "I already waited ${waited_time}s. I won't wait any longer."
         exit 1
     fi
     sleep ${sleep_time}
