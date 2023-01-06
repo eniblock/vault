@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-set -eu
+set -e
 set -x
 
 plugin_name=${1}
@@ -10,6 +10,8 @@ if test -z "${VAULT_ADDR}"
 then
     VAULT_ADDR='http://127.0.0.1:8200'
 fi
+
+set -u
 
 export VAULT_ADDR
 export VAULT_TOKEN="${VAULT_ROOT_TOKEN}"

@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-set -eu
+set -e
 
 if test -n "${VAULT_ADDR}"
 then
@@ -8,6 +8,8 @@ then
 else
     VAULT_ADDRESS=127.0.0.1:8200
 fi
+
+set -u
 
 # unlike VAULT_ADDR, that contains the http:// prefix
 
