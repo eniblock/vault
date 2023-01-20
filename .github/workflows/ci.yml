@@ -5,6 +5,9 @@ on:
       - "**"
     tags:
       - "*"
+env:
+  DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+  HELM_DIR: ./helm/vault
 
 jobs:
 
@@ -13,10 +16,7 @@ jobs:
   lint-helm:
     runs-on: [self-hosted]
     steps:
-    - uses: eniblock/build/actions/setup@4.0
-      id: setup
-      with:
-        dockerhub_token: ${{ secrets.DOCKERHUB_TOKEN }}
+    - uses: eniblock/build/actions/setup@4.1
     - run: earthly ./helm+lint
 
   ############################ docker ############################
@@ -25,12 +25,8 @@ jobs:
     runs-on: [self-hosted]
     needs: [lint-helm]
     steps:
-    - uses: eniblock/build/actions/setup@4.0
-      id: setup
-      with:
-        helmdir: helm/vault
-        dockerhub_token: ${{ secrets.DOCKERHUB_TOKEN }}
-    - run: earthly +docker --tag=${{ steps.setup.outputs.tag }}
+    - uses: eniblock/build/actions/setup@4.1
+    - run: earthly +docker --tag=${{ env.TAG }}
 
   ############################ helm ############################
 
@@ -38,14 +34,31 @@ jobs:
     runs-on: [self-hosted]
     needs: [docker]
     steps:
-    - uses: eniblock/build/actions/setup@4.0
-      id: setup
-      with:
-        helmdir: helm/vault
-        dockerhub_token: ${{ secrets.DOCKERHUB_TOKEN }}
+    - uses: eniblock/build/actions/setup@4.1
     - name: Build/Publish the helm charts
       run: |
         earthly \
           --secret registry_password=${{ github.token }} \
           ./helm+publish \
-          --tag=${{ steps.setup.outputs.tag }}
+          --tag=${{ env.TAG }}
+    - name: Generate job summary
+      run: |
+        cat <<"EOF" >> $GITHUB_STEP_SUMMARY
+        ## Helm package
+        Helm package was generated with tag `${{ env.TAG }}`
+
+        Use it directly with
+
+        ~~~bash
+        helm install vault oci://ghcr.io/eniblock/vault --version ${{ env.TAG }}
+        ~~~
+
+        or as a helm dependency in your `Chart.yaml`:
+
+        ~~~yaml
+        dependencies:
+          - name: vault
+            version: "${{ env.TAG }}"
+            repository: "oci://ghcr.io/eniblock"
+        ~~~
+        EOF
