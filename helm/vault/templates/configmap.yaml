@@ -1,33 +1,3 @@
-{{- if .Values.customInitScript }}
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ include "vault.fullname" . }}-custom-init
-  namespace: {{ .Release.Namespace }}
-  labels:
-    {{- include "vault.labels" . | nindent 4 }}
-data:
-  custom-init.sh: |
-{{- .Values.customInitScript | nindent 4 }}
-{{- end}}
-
----
-
-{{- if .Values.postStartScript }}
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ include "vault.fullname" . }}-post-start
-  namespace: {{ .Release.Namespace }}
-  labels:
-    {{- include "vault.labels" . | nindent 4 }}
-data:
-  post-start.sh: |
-{{- .Values.postStartScript | nindent 4 }}
-{{- end}}
-
----
-
 apiVersion: v1
 kind: ConfigMap
 metadata:

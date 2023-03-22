@@ -1,0 +1,12 @@
+{{- if .Values.customInitScript }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "vault.fullname" . }}-custom-init
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "vault.labels" . | nindent 4 }}
+data:
+  custom-init.sh: |
+{{- .Values.customInitScript | nindent 4 }}
+{{- end}}
