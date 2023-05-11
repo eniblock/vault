@@ -81,7 +81,6 @@ if [ ! -f /vault/file/init.done ]; then
   wait %1
 fi
 
-
 if [ -f /vault/file/init.log ]; then
   # the unseal key is available on the disk, lets use it
   vault server -config /vault/config &
