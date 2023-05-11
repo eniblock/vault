@@ -19,6 +19,15 @@ for f in $(ls /extra/config); do
   cat /extra/config/$f > /vault/config/$f
 done
 
+function start_local_vault {
+  mkdir -p /dev/shm/vault/config
+  cp -r /vault/config/* /dev/shm/vault/config/
+  # override the listener with one restricted to 127.0.0.1
+  cp /listener-init.hcl /dev/shm/vault/config/listener.hcl
+  vault server -config /dev/shm/vault/config &
+  dockerize -wait tcp://127.0.0.1:8201 -timeout "${VAULT_START_TIMEOUT}"
+}
+
 if [ ! -f /vault/file/init.done ]; then
   if [ -n "$VAULT_INIT_TOKEN" ]; then
     # try to write something in vault, in order to be sure we'll be able to do that once
@@ -26,13 +35,8 @@ if [ ! -f /vault/file/init.done ]; then
     env VAULT_TOKEN=$VAULT_INIT_TOKEN VAULT_ADDR=$VAULT_INIT_URL vault kv put $VAULT_INIT_PATH/vault "check=true"
   fi
 
-  mkdir -p /dev/shm/vault/config
-  cp -r /vault/config/* /dev/shm/vault/config/
-  # override the listener with one restricted to 127.0.0.1
-  cp /listener-init.hcl /dev/shm/vault/config/listener.hcl
-  vault server -config /dev/shm/vault/config &
+  start_local_vault
   export VAULT_ADDR='http://127.0.0.1:8201'
-  dockerize -wait tcp://127.0.0.1:8201 -timeout "${VAULT_START_TIMEOUT}"
 
   if [ -n "$VAULT_INIT_TOKEN" ]; then
     LOGS=$(vault operator init -recovery-shares=1 -recovery-threshold=1)
@@ -77,6 +81,16 @@ if [ ! -f /vault/file/init.done ]; then
   wait %1
 fi
 
+if test -f /init/dev-vault-start-post-hook.sh
+then
+  start_local_vault
+  export VAULT_ADDR='http://127.0.0.1:8201'
+  . /init/dev-vault-start-post-hook.sh
+  unset VAULT_ADDR
+  kill %1
+  wait %1
+fi
+
 if [ -f /vault/file/init.log ]; then
   # the unseal key is available on the disk, lets use it
   vault server -config /vault/config &
@@ -84,10 +98,6 @@ if [ -f /vault/file/init.log ]; then
   export VAULT_ADDR='http://127.0.0.1:8200'
   UNSEAL_KEY=$(sed 's/^Unseal Key 1: \(.*\)$/\1/' < /vault/file/init.log | head -n 1)
   vault operator unseal "$UNSEAL_KEY"
-  if test -f /init/dev-vault-start-post-hook.sh
-  then
-      . /init/dev-vault-start-post-hook.sh
-  fi
   wait %1
 else
   exec vault server -config /vault/config
