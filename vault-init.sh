@@ -81,15 +81,6 @@ if [ ! -f /vault/file/init.done ]; then
   wait %1
 fi
 
-if test -f /init/dev-vault-start-post-hook.sh
-then
-  start_local_vault
-  export VAULT_ADDR='http://127.0.0.1:8201'
-  . /init/dev-vault-start-post-hook.sh
-  unset VAULT_ADDR
-  kill %1
-  wait %1
-fi
 
 if [ -f /vault/file/init.log ]; then
   # the unseal key is available on the disk, lets use it
@@ -98,7 +89,20 @@ if [ -f /vault/file/init.log ]; then
   export VAULT_ADDR='http://127.0.0.1:8200'
   UNSEAL_KEY=$(sed 's/^Unseal Key 1: \(.*\)$/\1/' < /vault/file/init.log | head -n 1)
   vault operator unseal "$UNSEAL_KEY"
+  if test -f /init/dev-vault-start-post-hook.sh
+  then
+      . /init/dev-vault-start-post-hook.sh
+  fi
   wait %1
 else
+  if test -f /init/dev-vault-start-post-hook.sh
+  then
+    start_local_vault
+    export VAULT_ADDR='http://127.0.0.1:8201'
+    . /init/dev-vault-start-post-hook.sh
+    unset VAULT_ADDR
+    kill %1
+    wait %1
+  fi
   exec vault server -config /vault/config
 fi
