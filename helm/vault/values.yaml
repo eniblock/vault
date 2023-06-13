@@ -127,3 +127,9 @@ persistence:
 
 networkPolicy:
   enabled: true
+
+# use existing secrets for environment variables
+extraEnvFromExistingSecrets: []
+
+# use existing config maps for environment variables
+extraEnvFromExistingConfigMaps: []

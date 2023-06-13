@@ -38,11 +38,19 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          {{- if or (not .Values.server.dev.existingSecret) (.Values.server.standalone.enabled) (.Values.server.initSecrets) }}
           envFrom:
+          {{- if or (not .Values.server.dev.existingSecret) (.Values.server.standalone.enabled) (.Values.server.initSecrets) }}
             - secretRef:
                 name: {{ include "vault.fullname" . }}
           {{- end }}
+            {{- range $v := .Values.extraEnvFromExistingSecrets }}
+            - secretRef:
+                name: {{ tpl $v $ }}
+            {{- end }}
+            {{- range $v := .Values.extraEnvFromExistingConfigMaps }}
+            - configMapRef:
+                name: {{ tpl $v $ }}
+            {{- end }}
           env:
             - name: VAULT_DEBUG
               value: {{ .Values.server.debug | quote }}
