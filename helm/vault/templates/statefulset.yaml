@@ -54,6 +54,8 @@ spec:
           env:
             - name: VAULT_DEBUG
               value: {{ .Values.server.debug | quote }}
+            - name: VAULT_DEFAULT_MAX_REQUEST_DURATION
+              value: "{{ .Values.default_max_request_duration }}"
             {{- if .Values.server.dev.existingSecret }}
             - name: VAULT_ROOT_TOKEN
               valueFrom:

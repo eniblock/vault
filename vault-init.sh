@@ -19,6 +19,10 @@ for f in $(ls /extra/config); do
   cat /extra/config/$f > /vault/config/$f
 done
 
+cat<<EOF > /vault/config/dynamic.hcl
+default_max_request_duration = "${VAULT_DEFAULT_MAX_REQUEST_DURATION}"
+EOF
+
 function start_local_vault {
   mkdir -p /dev/shm/vault/config
   cp -r /vault/config/* /dev/shm/vault/config/

@@ -8,6 +8,8 @@ global:
 
 replicaCount: 1
 
+default_max_request_duration: 90s
+
 image:
   repository: "eniblock/vault"
   pullPolicy: IfNotPresent
