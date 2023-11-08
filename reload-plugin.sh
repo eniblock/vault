@@ -30,12 +30,22 @@ if vault_tss_already_registered && test "$(vault_tss_registered_hash)" = "${HASH
 then
     echo "Vault plugin ${plugin_name} already registered and up-to-date" >&2
 else
-    vault plugin register -sha256 "${HASH}" "${plugin_name}"
-    vault plugin reload -plugin "${plugin_name}"
-    if vault secrets list | grep -q "^${plugin_name}/"
+    VERSION_FILE="/${plugin_name}-version.txt"
+    if test -e "${VERSION_FILE}"
     then
-        vault secrets disable "${plugin_name}"
+        version="$(cat "${VERSION_FILE}")"
+    else
+        version="0.0.0"
     fi
-
-    vault secrets enable -path "${plugin_name}" -description "From plugin '${plugin_name}'" "$@" "${plugin_name}"
+    last_number="$(echo "${version}"|sed -r 's/^([0-9.]+)\.([0-9]+)$/\2/')"
+    prev_numbers="$(echo "${version}"|sed -r 's/^([0-9.]+)\.([0-9]+)$/\1/')"
+    version="${prev_numbers}.$((last_number + 1))"
+    vault plugin register -version="${version}" -sha256 "${HASH}" "${plugin_name}"
+    if ! { vault secrets list | grep -q "^${plugin_name}/" ; }
+    then
+        vault secrets enable -path "${plugin_name}" -description "From plugin '${plugin_name}'" "$@" "${plugin_name}"
+    fi
+    vault secrets tune -plugin-version="${version}" "${plugin_name}"
+    vault plugin reload -plugin "${plugin_name}"
+    echo "${version}" > "${VERSION_FILE}"
 fi
