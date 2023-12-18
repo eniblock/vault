@@ -54,6 +54,10 @@ spec:
           env:
             - name: VAULT_DEBUG
               value: {{ .Values.server.debug | quote }}
+            {{- if .Values.server.debug }}
+            - name: VAULT_LOG_LEVEL
+              value: debug
+            {{- end }}
             - name: VAULT_DEFAULT_MAX_REQUEST_DURATION
               value: "{{ .Values.default_max_request_duration }}"
             {{- if .Values.server.dev.existingSecret }}
